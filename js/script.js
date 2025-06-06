@@ -16,10 +16,8 @@ faqButtons.forEach(button => {
     const isVisible = currentAnswer.classList.contains('show');
 
     faqButtons.forEach(btn => {
-      const answer = btn.nextElementSibling;
-      const plusSign = btn.querySelector('.plus-sign');
-      answer.classList.remove('show');
-      plusSign.textContent = '+';
+      btn.nextElementSibling.classList.remove('show');
+      btn.querySelector('.plus-sign').textContent = '+';
     });
 
     if (!isVisible) {
@@ -31,19 +29,13 @@ faqButtons.forEach(button => {
 
 const backToTopButton = document.getElementById("backToTop");
 
-window.onscroll = function () {
-  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-    backToTopButton.style.display = "block";
-  } else {
-    backToTopButton.style.display = "none";
-  }
-};
+window.addEventListener("scroll", () => {
+  const scrollY = window.scrollY || document.documentElement.scrollTop;
+  backToTopButton.style.display = scrollY > 300 ? "block" : "none";
+});
 
 backToTopButton.addEventListener("click", () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
 const sliderTrack = document.getElementById('slider-track');
@@ -52,25 +44,22 @@ const btnRight = document.getElementById('btn-right');
 
 let currentPosition = 0;
 
-// Calculate the width of one card including margin
 const card = sliderTrack.querySelector('.testimonial-card');
 const cardStyle = window.getComputedStyle(card);
 const cardWidth = card.offsetWidth + parseInt(cardStyle.marginLeft) + parseInt(cardStyle.marginRight);
 
 const maxScroll = sliderTrack.scrollWidth - sliderTrack.clientWidth;
 
-btnRight.addEventListener('click', () => {
-  currentPosition += cardWidth;
-  if (currentPosition > maxScroll) {
-    currentPosition = maxScroll; // don't scroll beyond last card
-  }
+function updateSliderPosition() {
   sliderTrack.style.transform = `translateX(-${currentPosition}px)`;
+}
+
+btnRight.addEventListener('click', () => {
+  currentPosition = Math.min(currentPosition + cardWidth, maxScroll);
+  updateSliderPosition();
 });
 
 btnLeft.addEventListener('click', () => {
-  currentPosition -= cardWidth;
-  if (currentPosition < 0) {
-    currentPosition = 0; // don't scroll before first card
-  }
-  sliderTrack.style.transform = `translateX(-${currentPosition}px)`;
+  currentPosition = Math.max(currentPosition - cardWidth, 0);
+  updateSliderPosition();
 });
